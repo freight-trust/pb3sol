@@ -73,10 +73,10 @@ def gen_enum_definition(msg, parent_struct_name):
 def gen_utility_functions(msg, parent_struct_name):
     return (
         "  //utility functions                                           \n"
-        "  function nil() internal pure returns ({name} r) {{        \n"
+        "  function nil() internal pure returns ({name} memory r) {{        \n"
         "    assembly {{ r := 0 }}                                       \n"
         "  }}                                                            \n"
-        "  function isNil({name} x) internal pure returns (bool r) {{\n"
+        "  function isNil({name} memory x) internal pure returns (bool r) {{\n"
         "    assembly {{ r := iszero(x) }}                               \n"
         "  }}                                                            \n"
     ).format(
@@ -151,14 +151,14 @@ def gen_map_helper_codes_for_field(f, nested_type):
     kf = nested_type.field[0]
     vf = nested_type.field[1]
     return ("""  //map helpers for {name}
-  function get_{name}(Data storage self, {key_type} key) internal view returns ({value_type} {storage_type}) {{
+  function get_{name}(Data storage self, {key_type} memory key) internal view returns ({value_type} {storage_type}) {{
     return {val_name}[{map_name}[key] - 1].value;
   }}
-  function search_{name}(Data storage self, {key_type} key) internal view returns (bool, {value_type} {storage_type}) {{
+  function search_{name}(Data storage self, {key_type} memory key) internal view returns (bool, {value_type} {storage_type}) {{
     if ({map_name}[key] <= 0) {{ return (false, {val_name}[0].value); }}
     return (true, {val_name}[{map_name}[key] - 1].value);
   }}                                                                  
-  function add_{name}(Data storage self, {key_type} key, {value_type} value) internal {{
+  function add_{name}(Data storage self, {key_type} memory key, {value_type} memory value) internal {{
     if ({map_name}[key] != 0) {{
       {copy_value_exists}
     }} else {{
@@ -168,12 +168,12 @@ def gen_map_helper_codes_for_field(f, nested_type):
       {map_name}[key] = {val_name}.length;
     }}
   }}
-  function rm_{name}(Data storage self, {key_type} key) internal {{
+  function rm_{name}(Data storage self, {key_type} memory key) internal {{
     uint pos = {map_name}[key];
     if (pos == 0) {{
       return;
     }}
-    {val_name}[pos - 1] = {val_name}[{val_name}.length - 1];
+    {val_name}[pos - 1] = {val_name}[{val_name}.length - 1];gen_map_helper
     {val_name}.length--;
     delete {map_name}[key];
   }}
@@ -286,7 +286,7 @@ def generate_code(request, response):
 
         # generate sol library
         # prologue
-        output.append('pragma solidity ^{0};'.format(util.SOLIDITY_VERSION))
+        output.append('pragma solidity >={0};'.format(util.SOLIDITY_VERSION))
         for pragma in util.SOLIDITY_PRAGMAS:
             output.append('{0};'.format(pragma))
         output.append('import "./{0}";'.format(RUNTIME_FILE_NAME))

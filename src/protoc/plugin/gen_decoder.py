@@ -2,11 +2,11 @@ import gen_util as util
 
 def gen_main_decoder(msg, parent_struct_name):
     return (
-        "  function decode(bytes bs) {visibility} pure returns ({name}) {{\n"
+        "  function decode(bytes memory bs) {visibility} pure returns ({name} memory) {{\n"
         "    (Data memory x,) = _decode(32, bs, bs.length);                       \n"
         "    return x;                                                    \n"
         "  }}\n"
-        "  function decode({name} storage self, bytes bs) {visibility} {{\n"
+        "  function decode({name} storage self, bytes memory bs) {visibility} {{\n"
         "    (Data memory x,) = _decode(32, bs, bs.length);                    \n"
         "    store(x, self);                                           \n"
         "  }}"
@@ -62,8 +62,8 @@ def gen_inner_arraty_allocators(msg, parent_struct_name):
 
 def gen_inner_decoder(msg, parent_struct_name):
     return (
-        "  function _decode(uint p, bytes bs, uint sz)                   \n"
-        "      internal pure returns ({struct}, uint) {{             \n"
+        "  function _decode(uint p, bytes memory bs, uint sz)            \n"
+        "      internal pure returns ({struct} memory, uint) {{          \n"
         "    {struct} memory r;                                          \n"
         "    uint[{n}] memory counters;                                  \n"
         "    uint fieldId;                                               \n"
@@ -95,7 +95,7 @@ def gen_inner_decoder(msg, parent_struct_name):
 def gen_field_reader(f, parent_struct_name, msg):
     suffix = ("[ r.{field}.length - counters[{i}] ]").format(field = f.name, i = f.number) if util.field_is_repeated(f) else ""
     return (
-        "  function _read_{field}(uint p, bytes bs, {t} r, uint[{n}] counters) internal pure returns (uint) {{                            \n"
+        "  function _read_{field}(uint p, bytes memory bs, {t} memory r, uint[{n}] memory counters) internal pure returns (uint) {{                            \n"
         "    ({decode_type} x, uint sz) = {decoder}(p, bs);                   \n"
         "    if(isNil(r)) {{                                                  \n" 
         "      counters[{i}] += 1;                                            \n"
@@ -121,13 +121,13 @@ def gen_field_readers(msg, parent_struct_name):
 
 def gen_struct_decoder(f, msg, parent_struct_name):
     return (
-        "  function {name}(uint p, bytes bs)            \n"
-        "      internal pure returns ({struct}, uint) {{    \n"
-        "    (uint sz, uint bytesRead) = _pb._decode_varint(p, bs);   \n"
-        "    p += bytesRead;                                    \n"
-        "    ({decode_type} r,) = {lib}._decode(p, bs, sz);               \n"
-        "    return (r, sz + bytesRead);                        \n"
-        "  }}      \n"
+        "  function {name}(uint p, bytes memory bs)                \n"
+        "      internal pure returns ({struct} memory, uint) {{    \n"
+        "    (uint sz, uint bytesRead) = _pb._decode_varint(p, bs);\n"
+        "    p += bytesRead;                                       \n"
+        "    ({decode_type} r,) = {lib}._decode(p, bs, sz);        \n"
+        "    return (r, sz + bytesRead);                           \n"
+        "  }}                                                      \n"
     ).format(
         struct = util.gen_global_type_name_from_field(f),
         decode_type = util.gen_global_type_decl_from_field(f),

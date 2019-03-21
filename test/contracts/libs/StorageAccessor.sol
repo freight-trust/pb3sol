@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity >=0.4.24;
 
 import "./Restrictable.sol";
 import "./Storage.sol";
@@ -11,12 +11,12 @@ contract StorageAccessor is Restrictable {
         storageContract = Storage(storageAddress);
     }
 
-    function saveBytesByString(string key, bytes memory b) internal {
+    function saveBytesByString(string memory key, bytes memory b) internal {
         storageContract.setBytesByString(key, b);
     }
     //after ABIEncoderV2 gets default, 
     //these codes will become just proxy for Storage(storageContract).getBytes(key)
-    function loadBytesByString(string key) internal view reader returns (bytes) {
+    function loadBytesByString(string memory key) internal view reader returns (bytes memory) {
         return Storage(storageContract).getBytesByString(key);
     }
 }

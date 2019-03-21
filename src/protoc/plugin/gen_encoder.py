@@ -3,7 +3,7 @@ import gen_util as util
 
 def gen_main_encoder(msg, parent_struct_name):
 	return (
-		"  function encode({struct} r) {visibility} pure returns (bytes) {{\n"
+		"  function encode({struct} memory r) {visibility} pure returns (bytes memory) {{\n"
 		"    bytes memory bs = new bytes(_estimate(r));					   \n"
 		"    uint sz = _encode(r, 32, bs);                                 \n"
 		"    assembly {{ mstore(bs, sz) }}                                 \n"
@@ -42,7 +42,7 @@ def gen_inner_field_encoders(msg, parent_struct_name):
 
 def gen_inner_encoder(msg, parent_struct_name):
 	return (
-		"  function _encode({struct} r, uint p, bytes bs)        \n"
+		"  function _encode({struct} memory r, uint p, bytes memory bs)        \n"
 		"      internal pure returns (uint) {{               \n"
 		"    uint offset = p;                                   \n"
 		"{counter}\n"
@@ -57,7 +57,7 @@ def gen_inner_encoder(msg, parent_struct_name):
 
 def gen_nested_encoder(msg, parent_struct_name):
 	return (
-		"  function _encode_nested({struct} r, uint p, bytes bs)        \n"
+		"  function _encode_nested({struct} memory r, uint p, bytes memory bs)        \n"
 		"      internal pure returns (uint) {{                       \n"
 		"    uint offset = p;                                           \n"
 		"    p += _pb._encode_varint(_estimate(r), p, bs);              \n"
@@ -125,7 +125,7 @@ def gen_estimator(msg, parent_struct_name):
 	est = gen_field_estimators(msg, parent_struct_name)
 	not_pure = util.str_contains(est, "r.")
 	return (
-		"  function _estimate({struct} {varname}) internal {mutability} returns (uint) {{ \n"
+		"  function _estimate({struct} memory {varname}) internal {mutability} returns (uint) {{ \n"
 		"    uint e;                                                        \n"
 		"{counter}\n"
 		"{estimators}\n"

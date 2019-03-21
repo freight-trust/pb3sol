@@ -1,4 +1,4 @@
-pragma solidity ^0.4.17;
+pragma solidity >=0.4.17;
 
 import "./libs/StorageAccessor.sol";
 import "./libs/pb/TaskList2_pb.sol";

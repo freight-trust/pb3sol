@@ -1,4 +1,4 @@
-pragma solidity ^0.4.17;
+pragma solidity >=0.4.17;
 
 import "./Restrictable.sol";
 
@@ -9,10 +9,10 @@ contract Storage is Restrictable {
     constructor() Restrictable() public {
     }
 
-    function getBytesByString(string key) public view reader returns (bytes) {
+    function getBytesByString(string memory key) public view reader returns (bytes memory) {
         return stringMap[key];
     }
-    function getRangeBytesByString(string key, uint offset) public view reader returns (byte[256], uint) {
+    function getRangeBytesByString(string memory key, uint offset) public view reader returns (byte[256] memory, uint) {
         bytes memory bs = stringMap[key];
         byte[256] memory rbs;
         uint remain = bs.length - offset;
@@ -28,11 +28,11 @@ contract Storage is Restrictable {
         }
         return (rbs, remain);
     }
-    function getBytesLengthByString(string key) public view reader returns (uint) {
+    function getBytesLengthByString(string memory key) public view reader returns (uint) {
         bytes memory bs = stringMap[key];
         return bs.length;        
     }
-    function setBytesByString(string key, bytes data) public writer returns (bool) {
+    function setBytesByString(string memory key, bytes memory data) public writer returns (bool) {
         bytes memory prev = stringMap[key];
         stringMap[key] = data;
         assert(stringMap[key].length > 0);
